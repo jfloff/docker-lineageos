@@ -112,10 +112,10 @@ Inside the container there is script, called [`lineageos`](lineageos), that's us
 
 | Variable | Description |
 | -------- | ----------- |
-| `-c|--clean` | simply removes all the repo files (cache included) |
-| `i|init` | inits the repository making it ready to build LineageOS. In this step we init the repo and sync it. We also download the device's proprietary blobs, the user's extra files, and enable caching. |
-| `b|build` | Builds LineageOS! |
-| `s|sync` | Forces the LineageOS repo sync |
+| `-c` `--clean` | simply removes all the repo files (cache included) |
+| `i` `init` | inits the repository making it ready to build LineageOS. In this step we init the repo and sync it. We also download the device's proprietary blobs, the user's extra files, and enable caching. |
+| `b` `build` | Builds LineageOS! |
+| `s` `sync` | Forces the LineageOS repo sync |
 | `all` | shortcut for performing `lineageos init build` |
 
 Remember you can compose multiple instructions, for example, for a completly clean build you can run `lineageos all --clean` (or `lineageos -c init build`).
