@@ -1,8 +1,13 @@
 # docker-lineageos
 
+[![Docker Stars](https://img.shields.io/docker/stars/jfloff/lineageos.svg)][hub]
+[![Docker Pulls](https://img.shields.io/docker/pulls/jfloff/lineageos.svg)][hub]
+
+[hub]: https://hub.docker.com/r/jfloff/lineageos/
+
 Docker container for building [LineageOS](https://lineageos.org/) (formerly known as CyanogenMod). 
 
-## TLDR
+### TLDR
 
 **Note**: Remember that LineageOS is a huge project. It will consume a large amount of disk space (~80 GB).
 
@@ -22,7 +27,19 @@ $ docker run --rm --privileged \
   -ti jfloff/lineageos lineageos init build
 ```
 
-## Motivation
+
+<!-- MDTOC maxdepth:6 firsth1:0 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
+ 
+- [Why?](#why)   
+- [Usage](#usage)   
+- [Building a custom device configuration](#building-a-custom-device-configuration)   
+- [`lineageos` script](#lineageos-script)   
+- [License](#license)
+
+<!-- /MDTOC -->
+
+
+## Why?
 
 Existing Docker images only provide a container with all the [dependencies installed](https://github.com/LineageOS/docker_build), and still require the user the [manually input most build commands](https://github.com/stucki/docker-lineageos#how-to-build-lineageos-for-your-device). There have been some attempts to have a more [automated](https://github.com/AnthoDingo/docker-lineageos) based on scripts, but they lack flexibility when building the repository (for example, they expect you to input the devices' proprietary blobs in between steps). On top of these issues, most of the repos use Ubuntu as their base image (which is known for being a large base image) and do not follow the Dockerfile recommendations (unoptimized layer caching).
 
@@ -56,13 +73,23 @@ $ docker run --rm --privileged \
 
 Note that we ran `lineageos init build` which is our custom script that is used to help init, sync and build LineageOS form within the container. Check `lineageos` script details below.
 
-**If your device doesn't have an env configuration available in the [`device-config`](device-config/) folder, you have to build a custom device configuration. We show how you build your own configuration below**. 
+**If your device doesn't have an env configuration available in the [`device-config`](device-config/) folder, you have to build a custom device configuration. We show how you [build your own configuration below](#building-a-custom-device-configuration)**. 
 
 Here is a list of devices that have configuration files available (check [`device-config`](device-config/) folder):
 - `klte`
 - `kltevzw`
 
 _**Feel free to open a PR to submit another device configuration.**_
+
+## `lineageos` script
+Inside the container there is script, called [`lineageos`](lineageos), that's used to automate most of the commands needed to init, sync and build LineageOS.  Let's go go over each option:
+- `-c|--clean`: Removes all the repo files (cache included)
+- `i|init`: Initializes the repository making it ready to build LineageOS. In this step we init the repo and sync it. We also download the device's proprietary blobs, the user's extra files, and enable caching.
+- `b|build`: Builds LineageOS!
+- `s|sync`: Forces sync of the LineageOS repo sync and (if set) of the device's proprietary blobs repo 
+- `all`: Shortcut for performing `lineageos init build`
+
+Remember you can compose multiple instructions, for example, for a completly clean build you can run `lineageos all --clean` (or `lineageos -c init build`).
 
 ## Building a custom device configuration
 
@@ -72,25 +99,25 @@ A device configuration is a simple file with several env variables set (you can 
 
 Here is a rundown of all the variables that you can set.
 
-| Variable | Description | Type | Default | Example |
-| -------- | ----------- | ---- | ------- | ------- |
-| **`GIT_USER_NAME`** | Username for git | _**Required**_ | | João Loff
-| **`GIT_USER_EMAIL`** | User email for git | _**Required**_ | | jfloff@inesc-id.pt
-| **`DEVICE_CODENAME`** | Device's codename (see [more](https://wiki.lineageos.org/devices/)) | _**Required**_ | | `klte`
-| **`BASE_DIR`** | Directory where host volume with LineageOS was mounted | *optional* | `/home/$USER` |  | 
-| **`LINEAGEOS_REPO`** | LineageOS repository | *optional* | `https://github.com/LineageOS/android.git` | 
-| **`LINEAGEOS_BRANCH`** | LineageOS Branch | _**Required**_ |  | `cm-14.1`
-| **`PROPRIETARY_BLOBS_REPO`** | Repo with the [device's proprietary blobs](https://wiki.lineageos.org/devices/klte/build#extract-proprietary-blobs). Not needed if you have the device itself.  |  *optional* | | `https://github.com/TheMuppets/proprietary_vendor_samsung`
-| **`PROPRIETARY_BLOBS_DIR`** | Directory to where the repo with the device's blobs will be cloned to | *optional* | | $BASE_DIR/vendor/samsung
-| **`USE_CCACHE`** | Turn on caching to speed up build (see [more](https://wiki.lineageos.org/devices/klte/build#turn-on-caching-to-speed-up-build)) | *optional* | `1` | `0` (to disable) | 
-| **`CCACHE_SIZE`** | Maximum amount of cache disk space allowed | *optional* | `50G` |  | 
-| **`CCACHE_COMPRESS`** | Enable the `ccache` compression | *optional* | `1` | `0` (to disable) | 
-| **`CCACHE_DIR`** | Directory used for caching | *optional* | `$BASE_DIR/cache` |  | 
-| **`ANDROID_JACK_VM_ARGS`** | Fixes [out-of-memory error for Jack compiler](https://wiki.lineageos.org/devices/klte/build#configure-jack). Increase the assigned memory if necessary | *optional* | `"-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"`
-| **`WITH_SU`** | Builds rom with root access | *optional* | `false` | `true` (to enable)
-| **`PRE_SYNC_SCRIPT`** | Path to script to run before `sync` | *optional* |  | /home/scripts/pre_sync.sh
-| **`PRE_BUILD_SCRIPT`** | Path to script to run before `build` | *optional* |  | /home/scripts/pre_build.sh
-| **`POST_BUILD_SCRIPT`** | Path to script to run after `build` | *optional* |  | /home/scripts/post_build.sh
+| Variable | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| **`GIT_USER_NAME`** | Username for git. Example: João Loff | _**Required**_ | |
+| **`GIT_USER_EMAIL`** | User email for git. Example: jfloff@inesc-id.pt | _**Required**_ | |
+| **`DEVICE_CODENAME`** | Device's codename (see [more](https://wiki.lineageos.org/devices/)). Example: `klte` | _**Required**_ | |
+| **`BASE_DIR`** | Directory where host volume with LineageOS was mounted | *optional* | `/home/$USER` |
+| **`LINEAGEOS_REPO`** | LineageOS repository | *optional* | `https://github.com/LineageOS/android.git` |
+| **`LINEAGEOS_BRANCH`** | LineageOS Branch. | *optional* | `cm-14.1` |
+| **`PROPRIETARY_BLOBS_REPO`** | Repo with the [device's proprietary blobs](https://wiki.lineageos.org/devices/klte/build#extract-proprietary-blobs). Not needed if you have the device itself. Example: `https://github.com/TheMuppets/proprietary_vendor_samsung` |  *optional* | |
+| **`PROPRIETARY_BLOBS_DIR`** | Directory to where the repo with the device's blobs will be cloned to. Example: `$BASE_DIR/vendor/samsung` | *optional* | |
+| **`USE_CCACHE`** | Turn on caching to speed up build (see [more](https://wiki.lineageos.org/devices/klte/build#turn-on-caching-to-speed-up-build)) | *optional* | `1` |
+| **`CCACHE_SIZE`** | Maximum amount of cache disk space allowed | *optional* | `50G` |
+| **`CCACHE_COMPRESS`** | Enable the `ccache` compression | *optional* | `1` |
+| **`CCACHE_DIR`** | Directory used for caching | *optional* | `$BASE_DIR/cache` |
+| **`ANDROID_JACK_VM_ARGS`** | Fixes [out-of-memory error for Jack compiler](https://wiki.lineageos.org/devices/klte/build#configure-jack). Increase the assigned memory if necessary | *optional* | `"-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"` |
+| **`WITH_SU`** | Builds rom with root access | *optional* | `false` |
+| **`PRE_SYNC_SCRIPT`** | Path to script to run before `sync`. Example: `/home/scripts/pre_sync.sh` | *optional* |  |
+| **`PRE_BUILD_SCRIPT`** | Path to script to run before `build`. Example: `/home/scripts/pre_build.sh` | *optional* |  |
+| **`POST_BUILD_SCRIPT`** | Path to script to run after `build`. Example: `/home/scripts/post_build.sh` | *optional* |  |
 
 You can pass any other env variable that you need, or just do some scripting. It's that flexible!
 
@@ -105,20 +132,6 @@ EXTRA_DOWNLOAD_1=(
 ```
 
 This template can be useful to download some files like the device's proprietary blobs that were obtain from the device itself (you can place those files in a link somewhere, and the script will download them), or just overall missing files while building.
-
-
-## `lineageos` script
-Inside the container there is script, called [`lineageos`](lineageos), that's used to automate most of the commands needed to init, sync and build LineageOS.  Let's go go over each option:
-
-| Variable | Description |
-| -------- | ----------- |
-| `-c` `--clean` | simply removes all the repo files (cache included) |
-| `i` `init` | inits the repository making it ready to build LineageOS. In this step we init the repo and sync it. We also download the device's proprietary blobs, the user's extra files, and enable caching. |
-| `b` `build` | Builds LineageOS! |
-| `s` `sync` | Forces the LineageOS repo sync |
-| `all` | shortcut for performing `lineageos init build` |
-
-Remember you can compose multiple instructions, for example, for a completly clean build you can run `lineageos all --clean` (or `lineageos -c init build`).
 
 
 # License
