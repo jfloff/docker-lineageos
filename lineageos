@@ -1,0 +1,247 @@
+#!/bin/bash -li
+
+############################
+# References:
+#   - Lineage KLTE build instructions:
+#     https://wiki.lineageos.org/devices/klte/build
+#   - User setup for building: 
+#     http://android-rebuilds.beuc.net/SDK_6.0.0/
+#   - Parameter expansion: 
+#     http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html (2.6.2)
+
+
+# ARGUMENTS
+INIT=0
+SYNC=0
+BUILD=0
+FORCE_CLEAN=0
+
+USAGE="$(basename "$0") <arg> -- Helper for lineage compilation tool
+
+where <arg> can be :
+    -c|--clean  -- Cleans the LineageOS repository folder
+    i|init      -- Init lineage repo
+    b|build     -- Compiles LineageOS
+    s|sync      -- Syncs LineageOS repo
+    all         -- shortcut for performing 'lineageos init build'
+"
+
+# Argparse
+while [[ $# > 0 ]]; do
+    key="$1"
+    shift
+    case $key in
+        i|init)
+            INIT=1
+            ;;
+        b|build)
+            BUILD=1
+            ;;
+        all)
+            INIT=1
+            BUILD=1
+            ;;
+        s|sync)
+            SYNC=1
+            ;;
+        -c|--clean)
+            FORCE_CLEAN=1
+            ;;
+        -h|--help)
+            echo "$USAGE"
+            ;;
+        *)
+            echo "[ERROR] Options not found."
+            echo "$USAGE"
+            ;;
+    esac
+done
+
+############################
+# VARS
+#
+
+BASHRC=$BASE_DIR/.bashrc
+LINEAGEOS_DEV_INIT=$BASE_DIR/.lineageos_dev_init
+
+############################
+# Functions
+#
+
+function force_clean {
+    echo "[INFO] Cleaning repo ..."
+    # remove everything in the repo
+    rm -rf ..?* .[!.]* *
+    # redo the .keep file
+    mkdir -p $CCACHE_DIR
+    # removing init file
+    rm -f $LINEAGEOS_DEV_INIT
+}
+
+function reload_bashrc {
+    PS1='foobar'
+    source $BASHRC
+}
+
+function config_git {
+    if [[ ! -z $GIT_USER_NAME ]]; then
+        git config --global user.name "$GIT_USER_NAME"; 
+    fi
+
+    if [[ ! -z $GIT_USER_EMAIL ]]; then
+        git config --global user.email "$GIT_USER_EMAIL";
+    fi
+
+    # if [[ (! $(git config --global --get user.name)) || (! $(git config --global --get user.email)) ]]; then 
+    #     echo "[WARNING] No git identity defined. Provide them as env variables (more info @ README)."
+    #     echo "          As an alternative you can input them directly next ..."
+    #     YN='no'
+    #     while [[ $YN != 'yes' ]] ; do
+    #         read -p "Git user name: " GIT_USER_NAME
+    #         read -p "Git user email: " GIT_USER_EMAIL
+    #         read -p "Accept the input [$GIT_USER_NAME/$GIT_USER_EMAIL] (yes/no)? " YN
+    #     done
+    #     sudo git config --global user.name "$GIT_USER_NAME";
+    #     sudo git config --global user.email "$GIT_USER_EMAIL";
+    # fi; 
+}
+
+function init {
+    # EVERYTHING BELOW NEEDS INIT FIRST
+    if [ -s $LINEAGEOS_DEV_INIT ]; then
+        echo "[INFO] Repository already initialized. Use [-c|--clean] for a clean init."
+    fi
+    config_git;
+
+    echo "[INFO] Initializing repository."
+    # forces yes to the anoying color output prompt
+    yes | repo init -u $LINEAGEOS_REPO -b $LINEAGEOS_BRANCH
+    # download repo
+    repo sync -c -j $(nproc --all)
+    
+    if [[ ! -z $PROPRIETARY_BLOBS_REPO ]]; then
+        echo "[INFO] Cloning device's proprietary blobs"
+        
+        # We could possibly improve this by clever search in the device/ folder
+        # but that would be too much work
+        # - https://stackoverflow.com/a/18194523/1700053
+        #
+        # AS A USER: - if you don't want to download a whole repo, use the EXTRA_DOWNLOAD_X variables
+        #            - if you have the device itself you can use EXTRA_DOWNLOADS_* var
+        if [ ! -d "$PROPRIETARY_BLOBS_DIR" ]; then
+            git clone -b cm-14.1 --single-branch $PROPRIETARY_BLOBS_REPO $PROPRIETARY_BLOBS_DIR
+        else
+            pushd $PROPRIETARY_BLOBS_DIR > /dev/null 2>&1
+            git pull
+            popd > /dev/null 2>&1
+        fi
+    fi
+
+    echo "[INFO] Downloading extra files"
+    while read -r download ; do
+        if [[ ! -z $download ]]; then
+            URL=$download[0]
+            TARGET=$download[1]
+            echo "- Downloading '${!URL}' to '${!TARGET}' ..."
+            curl -#L --create-dirs -o ${!TARGET} ${!URL}
+        fi
+    done <<< "$(set | grep -oP '^\w*EXTRA_DOWNLOAD_\w*(?==)')"
+
+    if [[ "$USE_CCACHE" == "1" ]]; then
+        echo "[INFO] Enable caching at '$CCACHE_DIR' with $CCACHE_SIZE"
+        prebuilts/misc/linux-x86/ccache/ccache -M $CCACHE_SIZE
+    fi
+
+    echo "[INFO] Setup 'build/envsetup.sh'"
+    # https://askubuntu.com/questions/650820/permission-denied-when-running-sh-file
+    chmod u+x build/envsetup.sh
+    shopt -s expand_aliases
+    source $BASE_DIR/build/envsetup.sh
+    breakfast $DEVICE_CODENAME
+
+    echo "[INFO] Export environment setup into '$LINEAGEOS_DEV_INIT'."
+    # Create own script so we user is free to modify its .bashrc
+    echo "
+        # expand envsetup at startup if its avalable
+        if [[ -f $BASE_DIR/build/envsetup.sh ]]; then
+            shopt -s expand_aliases
+            source $BASE_DIR/build/envsetup.sh
+        fi
+    " > $LINEAGEOS_DEV_INIT
+    # Add script to .bashrc
+    sudo touch $BASHRC
+    declare -a lines=("[[ -f $LINEAGEOS_DEV_INIT ]] && source $LINEAGEOS_DEV_INIT")
+    for line in "${lines[@]}"; do
+        grep -qF "$line" "$BASHRC" || echo "$line" | sudo tee --append $BASHRC
+    done
+
+    echo "[DONE] Init done."
+}
+
+function sync {
+    if [[ ! -z $PRE_SYNC_SCRIPT ]]; then
+        echo "[INFO] Run pre-sync script"
+        source "$PRE_SYNC_SCRIPT"
+    fi
+
+    echo "[INFO] Sync repository"
+    repo sync --force-sync -c -j $(nproc --all)
+
+    if [[ ! -z $PROPRIETARY_BLOBS_REPO ]]; then
+        # update mupets
+        echo "[INFO] Updating device's proprietary blobs repository"
+        pushd $PROPRIETARY_BLOBS_DIR > /dev/null 2>&1
+        git pull
+        popd > /dev/null 2>&1
+    fi
+}
+
+function build {
+    if [[ ! -z $PRE_BUILD_SCRIPT ]]; then
+        echo "[INFO] Run pre-build script"
+        source "$PRE_BUILD_SCRIPT"
+    fi
+    
+    echo "[INFO] Building LineageOS ..."
+    shopt -s expand_aliases
+    source $BASE_DIR/build/envsetup.sh
+    if [[ "$USE_CCACHE" == "1" ]]; then
+        prebuilts/misc/linux-x86/ccache/ccache -M $CCACHE_SIZE
+    fi
+    # starts configuration
+    breakfast $DEVICE_CODENAME
+    # starts building
+    croot
+    brunch $DEVICE_CODENAME
+
+    if [[ ! -z $POST_BUILD_SCRIPT ]]; then
+        echo "[INFO] Run post-build script"
+        source "$POST_BUILD_SCRIPT"
+    fi
+}
+
+############################
+# Script options
+#
+
+pushd $BASE_DIR > /dev/null 2>&1
+
+if [[ $FORCE_CLEAN == 1 ]]; then
+    force_clean;
+fi
+
+if [[ $INIT == 1 ]]; then
+    init;
+fi
+
+# if sync repo passes forces a lineage repo sync
+if [[ $SYNC == 1 ]]; then
+    sync;
+fi
+
+# if sync repo passes forces a lineage repo sync
+if [[ $BUILD == 1 ]]; then
+    build;
+fi
+
+popd > /dev/null 2>&1
