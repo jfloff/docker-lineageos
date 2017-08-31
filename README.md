@@ -101,27 +101,29 @@ Here is a rundown of all the variables that you can set.
 
 | Variable | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
-| **`GIT_USER_NAME`** | Username for git. Example: João Loff | _**Required**_ | |
-| **`GIT_USER_EMAIL`** | User email for git. Example: jfloff@inesc-id.pt | _**Required**_ | |
-| **`DEVICE_CODENAME`** | Device's codename (see [more](https://wiki.lineageos.org/devices/)). Example: `klte` | _**Required**_ | |
+| **`GIT_USER_NAME`** | Username for git. <br>*Example*: João Loff | _**Required**_ | |
+| **`GIT_USER_EMAIL`** | User email for git. <br>*Example*: jfloff@inesc-id.pt | _**Required**_ | |
+| **`DEVICE_CODENAME`** | Device's codename (see [more](https://wiki.lineageos.org/devices/)). <br>*Example*: `klte` | _**Required**_ | |
 | **`BASE_DIR`** | Directory where host volume with LineageOS was mounted | *optional* | `/home/$USER` |
 | **`LINEAGEOS_REPO`** | LineageOS repository | *optional* | `https://github.com/LineageOS/android.git` |
 | **`LINEAGEOS_BRANCH`** | LineageOS Branch. | *optional* | `cm-14.1` |
-| **`PROPRIETARY_BLOBS_REPO`** | Repo with the [device's proprietary blobs](https://wiki.lineageos.org/devices/klte/build#extract-proprietary-blobs). Not needed if you have the device itself. Example: `https://github.com/TheMuppets/proprietary_vendor_samsung` |  *optional* | |
-| **`PROPRIETARY_BLOBS_DIR`** | Directory to where the repo with the device's blobs will be cloned to. Example: `$BASE_DIR/vendor/samsung` | *optional* | |
+| **`PROPRIETARY_BLOBS_REPO`** | Repo with the [device's proprietary blobs](https://wiki.lineageos.org/devices/klte/build#extract-proprietary-blobs). <br>*Example*: `https://github.com/TheMuppets/proprietary_vendor_samsung` |  *optional* | |
+| **`PROPRIETARY_BLOBS_DIR`** | Directory to where the repo with the device's blobs will be cloned to. <br>*Example*: `$BASE_DIR/vendor/samsung` | *optional* | |
 | **`USE_CCACHE`** | Turn on caching to speed up build (see [more](https://wiki.lineageos.org/devices/klte/build#turn-on-caching-to-speed-up-build)) | *optional* | `1` |
 | **`CCACHE_SIZE`** | Maximum amount of cache disk space allowed | *optional* | `50G` |
 | **`CCACHE_COMPRESS`** | Enable the `ccache` compression | *optional* | `1` |
 | **`CCACHE_DIR`** | Directory used for caching | *optional* | `$BASE_DIR/cache` |
 | **`ANDROID_JACK_VM_ARGS`** | Fixes [out-of-memory error for Jack compiler](https://wiki.lineageos.org/devices/klte/build#configure-jack). Increase the assigned memory if necessary | *optional* | `"-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"` |
 | **`WITH_SU`** | Builds rom with root access | *optional* | `false` |
-| **`PRE_SYNC_SCRIPT`** | Path to script to run before `sync`. Example: `/home/scripts/pre_sync.sh` | *optional* |  |
-| **`PRE_BUILD_SCRIPT`** | Path to script to run before `build`. Example: `/home/scripts/pre_build.sh` | *optional* |  |
-| **`POST_BUILD_SCRIPT`** | Path to script to run after `build`. Example: `/home/scripts/post_build.sh` | *optional* |  |
+| **`PRE_SYNC_SCRIPT`** | Path to script to run before `sync`. <br>*Example*: `/home/scripts/pre_sync.sh` | *optional* |  |
+| **`PRE_BUILD_SCRIPT`** | Path to script to run before `build`. <br>*Example*: `/home/scripts/pre_build.sh` | *optional* |  |
+| **`POST_BUILD_SCRIPT`** | Path to script to run after `build`. <br>*Example*: `/home/scripts/post_build.sh` | *optional* |  |
 
 You can pass any other env variable that you need, or just do some scripting. It's that flexible!
 
-You also have a _template_-like env variable with the following format `EXTRA_DOWNLOAD_<ID>` that you can use to download extra files before you build. These variables have to use the following template `EXTRA_DOWNLOAD_<ID>=("<URL>" "<TARGET_PATH>")`, where `URL` is the url where the file is located and will be downloaded from (using curl), and `<TARGET_PATH>` is the folder (inside the container) to which the file will be downloaded to.
+You also have a _template_-like env variable with the following format `EXTRA_DOWNLOAD_<ID>` that you can use to download extra files before you build. This template can be useful to download some files like the device's proprietary blobs that were obtain from the device itself (you can place those files in a link somewhere, and the script will download them), or just overall missing files while building.
+
+These variables have to use the following template `EXTRA_DOWNLOAD_<ID>=("<URL>" "<TARGET_PATH>")`, where `URL` is the url where the file is located and will be downloaded from (using curl), and `<TARGET_PATH>` is the folder (inside the container) to which the file will be downloaded to.
 
 For example, the following env will download the file `msm8974pro_sec_klte_vzw_defconfig` to `kernel/samsung/klte/arch/arm/configs/`:
 ```shell
@@ -131,8 +133,8 @@ EXTRA_DOWNLOAD_1=(
 )
 ```
 
-This template can be useful to download some files like the device's proprietary blobs that were obtain from the device itself (you can place those files in a link somewhere, and the script will download them), or just overall missing files while building.
 
 
-# License
+
+## License
 MIT (see [LICENSE](LICENSE))
