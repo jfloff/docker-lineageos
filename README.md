@@ -7,6 +7,16 @@
 
 Docker container for building [LineageOS](https://lineageos.org/) (formerly known as CyanogenMod). 
 
+<!-- MDTOC maxdepth:6 firsth1:0 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
+
+- [Why?](#why)   
+- [Usage](#usage)   
+- [Building a custom device configuration](#building-a-custom-device-configuration)   
+- [`lineageos` script](#lineageos-script)   
+- [License](#license)
+
+<!-- /MDTOC -->
+
 ### TLDR
 
 **Note**: Remember that LineageOS is a huge project. It will consume a large amount of disk space (~80 GB).
@@ -26,18 +36,6 @@ $ docker run --rm --privileged \
   --env-file custom.env
   -ti jfloff/lineageos lineageos init build
 ```
-
-
-<!-- MDTOC maxdepth:6 firsth1:0 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
- 
-- [Why?](#why)   
-- [Usage](#usage)   
-- [Building a custom device configuration](#building-a-custom-device-configuration)   
-- [`lineageos` script](#lineageos-script)   
-- [License](#license)
-
-<!-- /MDTOC -->
-
 
 ## Why?
 
