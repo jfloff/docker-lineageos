@@ -5,7 +5,11 @@
 # https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e-env-env-file
 
 # backups current environment
-declare -p -x > /tmp/current.env
+# WARN: docker's --env-file parameters doesnt interpret the env file in a bash-like way
+# see this issue: https://github.com/moby/moby/issues/26009
+# we decide to unescape first and last double quotes (we leave the remaining as is)
+# we also unescape ALL $ signs
+declare -px | sed -e 's/"\\"/"/g; s/\\""/"/g; s/\\\$/\$/g' > /tmp/current.env
 
 # backup original name because it will be overwriten by default config
 ORIGINAL_DEVICE_CODENAME=$DEVICE_CODENAME

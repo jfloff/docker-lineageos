@@ -9,8 +9,8 @@ LABEL maintainer="jfloff@inesc-id.pt"
 
 # default user
 ENV USER=lineageos
-ENV \ 
-    # base dir 
+ENV \
+    # base dir
     BASE_DIR=/home/$USER \
     # device configuration dir
     DEVICE_CONFIGS_DIR=/home/device-config
@@ -79,7 +79,7 @@ RUN set -ex ;\
     groupadd -r lineageos && useradd -r -g lineageos lineageos && usermod -u 1000 lineageos ;\
     # allow non-root user to remount fs
     # adding ALL permissions so they can do other stuff in the future, like sudo vim
-    echo "lineageos ALL=NOPASSWD: ALL" >> /etc/sudoers ;\ 
+    echo "lineageos ALL=NOPASSWD: ALL" >> /etc/sudoers ;\
     # Android Setup
     # create paths: https://wiki.lineageos.org/devices/klte/build#create-the-directories
     curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo ;\

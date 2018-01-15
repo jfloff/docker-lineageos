@@ -4,9 +4,9 @@
 # References:
 #   - Lineage KLTE build instructions:
 #     https://wiki.lineageos.org/devices/klte/build
-#   - User setup for building: 
+#   - User setup for building:
 #     http://android-rebuilds.beuc.net/SDK_6.0.0/
-#   - Parameter expansion: 
+#   - Parameter expansion:
 #     http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html (2.6.2)
 
 
@@ -85,14 +85,14 @@ function reload_bashrc {
 
 function config_git {
     if [[ ! -z $GIT_USER_NAME ]]; then
-        git config --global user.name "$GIT_USER_NAME"; 
+        git config --global user.name "$GIT_USER_NAME";
     fi
 
     if [[ ! -z $GIT_USER_EMAIL ]]; then
         git config --global user.email "$GIT_USER_EMAIL";
     fi
 
-    # if [[ (! $(git config --global --get user.name)) || (! $(git config --global --get user.email)) ]]; then 
+    # if [[ (! $(git config --global --get user.name)) || (! $(git config --global --get user.email)) ]]; then
     #     echo "[WARNING] No git identity defined. Provide them as env variables (more info @ README)."
     #     echo "          As an alternative you can input them directly next ..."
     #     YN='no'
@@ -103,7 +103,7 @@ function config_git {
     #     done
     #     sudo git config --global user.name "$GIT_USER_NAME";
     #     sudo git config --global user.email "$GIT_USER_EMAIL";
-    # fi; 
+    # fi;
 }
 
 function init {
@@ -118,10 +118,10 @@ function init {
     yes | repo init -u $LINEAGEOS_REPO -b $LINEAGEOS_BRANCH
     # download repo
     repo sync -c -j $(nproc --all)
-    
+
     if [[ ! -z $PROPRIETARY_BLOBS_REPO ]]; then
         echo "[INFO] Cloning device's proprietary blobs"
-        
+
         # We could possibly improve this by clever search in the device/ folder
         # but that would be too much work
         # - https://stackoverflow.com/a/18194523/1700053
@@ -201,7 +201,7 @@ function build {
         echo "[INFO] Run pre-build script"
         source "$PRE_BUILD_SCRIPT"
     fi
-    
+
     echo "[INFO] Building LineageOS ..."
     shopt -s expand_aliases
     source $BASE_DIR/build/envsetup.sh
