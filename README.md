@@ -5,14 +5,14 @@
 
 [hub]: https://hub.docker.com/r/jfloff/lineageos/
 
-Docker container for building [LineageOS](https://lineageos.org/) (formerly known as CyanogenMod). 
+Docker container for building [LineageOS](https://lineageos.org/) (formerly known as CyanogenMod).
 
 <!-- MDTOC maxdepth:6 firsth1:0 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
 
-- [Why?](#why)   
-- [Usage](#usage)   
-- [Building a custom device configuration](#building-a-custom-device-configuration)   
-- [`lineageos` script](#lineageos-script)   
+- [Why?](#why)
+- [Usage](#usage)
+- [Building a custom device configuration](#building-a-custom-device-configuration)
+- [`lineageos` script](#lineageos-script)
 - [License](#license)
 
 <!-- /MDTOC -->
@@ -37,6 +37,16 @@ $ docker run --rm --privileged \
   -ti jfloff/lineageos lineageos init build
 ```
 
+
+<!-- MDTOC maxdepth:6 firsth1:0 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
+- [Why?](#why)
+- [Usage](#usage)
+- [Building a custom device configuration](#building-a-custom-device-configuration)
+- [`lineageos` script](#lineageos-script)
+- [License](#license)
+<!-- /MDTOC -->
+
+
 ## Why?
 
 Existing Docker images only provide a container with all the [dependencies installed](https://github.com/LineageOS/docker_build), and still require the user the [manually input most build commands](https://github.com/stucki/docker-lineageos#how-to-build-lineageos-for-your-device). There have been some attempts to have a more [automated](https://github.com/AnthoDingo/docker-lineageos) based on scripts, but they lack flexibility when building the repository (for example, they expect you to input the devices' proprietary blobs in between steps). On top of these issues, most of the repos use Ubuntu as their base image (which is known for being a large base image) and do not follow the Dockerfile recommendations (unoptimized layer caching).
@@ -47,7 +57,7 @@ We strive for more _automation_. Our goal is for users to be able to compile Lin
 
 The main working directory is a shared folder on the host system, so the Docker container can be removed at any time and used just to build. For example, `-v "$(pwd)/android":/home/lineageos`: here we are mounting the `android` directory into the `$BASE_DIR` directory which by default is `/home/lineageos`.
 
-Next, we have to set the device we want to build through an env variable, for example `-e DEVICE_CODENAME=klte`. This will also trigger the default configuration for that device (if a configuration available in the [`device-config` folder](device-config/)). 
+Next, we have to set the device we want to build through an env variable, for example `-e DEVICE_CODENAME=klte`. This will also trigger the default configuration for that device (if a configuration available in the [`device-config` folder](device-config/)).
 
 Finally we also have to set our git user information,  for example `-e GIT_USER_NAME=jfloff -e GIT_USER_EMAIL=jfloff@inesc-id.pt`.
 
@@ -61,7 +71,7 @@ $ docker run --rm --privileged \
   -ti jfloff/lineageos lineageos init build
 ```
 
-Instead of settings multiple env variables, you can also pass an env-file (as per [docker run reference](https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e-env-env-file)). 
+Instead of settings multiple env variables, you can also pass an env-file (as per [docker run reference](https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e-env-env-file)).
 ```shell
 $ docker run --rm --privileged \
   -v "$(pwd)/android":/home/lineageos \
@@ -71,11 +81,12 @@ $ docker run --rm --privileged \
 
 Note that we ran `lineageos init build` which is our custom script that is used to help init, sync and build LineageOS form within the container. Check `lineageos` script details below.
 
-**If your device doesn't have an env configuration available in the [`device-config`](device-config/) folder, you have to build a custom device configuration. We show how you [build your own configuration below](#building-a-custom-device-configuration)**. 
+**If your device doesn't have an env configuration available in the [`device-config`](device-config/) folder, you have to build a custom device configuration. We show how you [build your own configuration below](#building-a-custom-device-configuration)**.
 
 Here is a list of devices that have configuration files available (check [`device-config`](device-config/) folder):
 - `klte`
 - `kltevzw`
+- `bacon` (thanks @GRBurst)
 
 _**Feel free to open a PR to submit another device configuration.**_
 
@@ -84,16 +95,16 @@ Inside the container there is script, called [`lineageos`](lineageos), that's us
 - `-c|--clean`: Removes all the repo files (cache included)
 - `i|init`: Initializes the repository making it ready to build LineageOS. In this step we init the repo and sync it. We also download the device's proprietary blobs, the user's extra files, and enable caching.
 - `b|build`: Builds LineageOS!
-- `s|sync`: Forces sync of the LineageOS repo sync and (if set) of the device's proprietary blobs repo 
+- `s|sync`: Forces sync of the LineageOS repo sync and (if set) of the device's proprietary blobs repo
 - `all`: Shortcut for performing `lineageos init build`
 
 Remember you can compose multiple instructions, for example, for a completly clean build you can run `lineageos all --clean` (or `lineageos -c init build`).
 
 ## Building a custom device configuration
 
-A device configuration is a simple file with several env variables set (you can also pass these variables directly to `docker run`). All the magic happens underneath. 
+A device configuration is a simple file with several env variables set (you can also pass these variables directly to `docker run`). All the magic happens underneath.
 
-**NOTE**: Any env variables you pass as will overwrite the default configurations (from the [`default.env` file](default.env)), and the pre-existing device-specific configuration files from the [`device-config`](device-config/) folder. I.e., the precedence order looks something like this: _custom env_ > _device-config-file.env_ > _default.env_ 
+**NOTE**: Any env variables you pass as will overwrite the default configurations (from the [`default.env` file](default.env)), and the pre-existing device-specific configuration files from the [`device-config`](device-config/) folder. I.e., the precedence order looks something like this: _custom env_ > _device-config-file.env_ > _default.env_
 
 Here is a rundown of all the variables that you can set.
 
