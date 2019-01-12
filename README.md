@@ -2,7 +2,7 @@
 
 [![Docker Stars](https://img.shields.io/docker/stars/jfloff/lineageos.svg)][hub]
 [![Docker Pulls](https://img.shields.io/docker/pulls/jfloff/lineageos.svg)][hub]
-
+*
 [hub]: https://hub.docker.com/r/jfloff/lineageos/
 
 Docker container for building [LineageOS](https://lineageos.org/) (formerly known as CyanogenMod).
