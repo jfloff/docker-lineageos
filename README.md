@@ -2,7 +2,6 @@
 
 [![Docker Stars](https://img.shields.io/docker/stars/jfloff/lineageos.svg)][hub]
 [![Docker Pulls](https://img.shields.io/docker/pulls/jfloff/lineageos.svg)][hub]
-*
 [hub]: https://hub.docker.com/r/jfloff/lineageos/
 
 Docker container for building [LineageOS](https://lineageos.org/) (formerly known as CyanogenMod).
@@ -88,7 +87,7 @@ Here is a list of devices that have configuration files available (check [`devic
 - `kltevzw`
 - `bacon` (thanks @GRBurst)
 - `mako` (thanks @brainstorm)
-- `jfltexx` (thanks  @BenJule)
+- `jfltexx` (thanks @BenJule)
 
 _**Feel free to open a PR to submit another device configuration.**_
 
