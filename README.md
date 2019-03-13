@@ -117,6 +117,8 @@ Here is a rundown of all the variables that you can set.
 | **`BASE_DIR`** | Directory where host volume with LineageOS was mounted | *optional* | `/home/$USER` |
 | **`LINEAGEOS_REPO`** | LineageOS repository | *optional* | `https://github.com/LineageOS/android.git` |
 | **`LINEAGEOS_BRANCH`** | LineageOS Branch. | *optional* | `cm-14.1` |
+| **`LINEAGEOS_LOCAL_MANIFEST_REPO`** | LineageOS local manifest repository. | *optional* | |
+| **`LINEAGEOS_LOCAL_MANIFEST_BRANCH`** | LineageOS local manifest branch. | *optional* | |
 | **`PROPRIETARY_BLOBS_REPO`** | Repo with the [device's proprietary blobs](https://wiki.lineageos.org/devices/klte/build#extract-proprietary-blobs). <br>*Example*: `https://github.com/TheMuppets/proprietary_vendor_samsung` |  *optional* | |
 | **`PROPRIETARY_BLOBS_DIR`** | Directory to where the repo with the device's blobs will be cloned to. <br>*Example*: `$BASE_DIR/vendor/samsung` | *optional* | |
 | **`USE_CCACHE`** | Turn on caching to speed up build (see [more](https://wiki.lineageos.org/devices/klte/build#turn-on-caching-to-speed-up-build)) | *optional* | `1` |
