@@ -117,7 +117,7 @@ function init {
     # forces yes to the anoying color output prompt
     yes | repo init -u $LINEAGEOS_REPO -b $LINEAGEOS_BRANCH
     # download repo
-    repo sync -c -j $(nproc --all)
+    sync
 
     if [[ ! -z $PROPRIETARY_BLOBS_REPO ]]; then
         echo "[INFO] Cloning device's proprietary blobs"
