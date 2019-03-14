@@ -116,6 +116,13 @@ function init {
     echo "[INFO] Initializing repository."
     # forces yes to the anoying color output prompt
     yes | repo init -u $LINEAGEOS_REPO -b $LINEAGEOS_BRANCH
+
+    # Update tree with the local manifest (if provided)
+    if [[ ! -z $LINEAGEOS_LOCAL_MANIFEST_REPO ]]; then
+        echo "[INFO] Updating Lineage with local manifest repositories."
+        git clone $LINEAGEOS_LOCAL_MANIFEST_REPO .repo/local_manifests -b $LINEAGEOS_LOCAL_MANIFEST_BRANCH
+    fi
+
     # download repo
     sync
 
