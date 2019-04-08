@@ -88,6 +88,7 @@ Here is a list of devices that have configuration files available (check [`devic
 - `kltevzw`
 - `bacon` (thanks @GRBurst)
 - `mako` (thanks @brainstorm)
+- `cancro` (thanks Oguz Ersen - via email)
 
 _**Feel free to open a PR to submit another device configuration.**_
 
