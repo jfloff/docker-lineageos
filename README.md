@@ -79,7 +79,7 @@ $ docker run --rm --privileged \
   -ti jfloff/lineageos lineageos init build
 ```
 
-Note that we ran `lineageos init build` which is our custom script that is used to help init, sync and build LineageOS form within the container. Check `lineageos` script details below.
+Note that we ran `lineageos init build` which is our custom script that is used to help init, sync and build LineageOS from within the container. Check `lineageos` script details below.
 
 **If your device doesn't have an env configuration available in the [`device-config`](device-config/) folder, you have to build a custom device configuration. We show how you [build your own configuration below](#building-a-custom-device-configuration)**.
 
