@@ -1,5 +1,5 @@
-FROM openjdk:8
-LABEL maintainer="jfloff@inesc-id.pt"
+FROM ubuntu:20.10
+LABEL maintainer="fAiLix"
 
 ###################
 # This Dockerfile was based on the following Dockerfiles
@@ -28,6 +28,10 @@ RUN set -ex ;\
           bc \
           bison \
           build-essential \
+          ca-certificates \
+          ccache \
+          curl \
+          clang \
           flex \
           g++-multilib \
           gcc-multilib \
@@ -38,15 +42,17 @@ RUN set -ex ;\
           lib32ncurses5-dev \
           lib32readline-dev \
           lib32z1-dev \
-          libesd0-dev \
+          #libesd0-dev \
           liblz4-tool \
+          libncurses5 \
           libncurses5-dev \
           libsdl1.2-dev \
           libssl-dev \
-          libwxgtk3.0-dev \
+          #libwxgtk3.0-gtk3-dev \
           libxml2 \
           libxml2-utils \
           lzop \
+          #openjdk-11-jdk \
           pngcrush \
           rsync \
           schedtool \
