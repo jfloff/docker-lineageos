@@ -68,11 +68,13 @@ RUN set -ex ;\
           # so we have an editor inside the container
           vim \
           # has 'col' package needed for 'breakfast'
-	      bsdmainutils \
+          bsdmainutils \
+          # unzip is needed at least for Fairphone 4 build
+          unzip \
           # we can't build kernel on root (like docker runs)
           # we add these so we have a non-root user
           fakeroot \
-	      sudo \
+          sudo \
           ;\
     rm -rf /var/lib/apt/lists/*
 
