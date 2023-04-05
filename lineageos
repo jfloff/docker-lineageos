@@ -63,6 +63,7 @@ done
 
 BASHRC=$BASE_DIR/.bashrc
 LINEAGEOS_DEV_INIT=$BASE_DIR/.lineageos_dev_init
+PROPRIETARY_BLOBS_BRANCH="${PROPRIETARY_BLOBS_BRANCH:-$LINEAGEOS_BRANCH}"
 
 ############################
 # Functions
@@ -136,7 +137,7 @@ function init {
         # AS A USER: - if you don't want to download a whole repo, use the EXTRA_DOWNLOAD_X variables
         #            - if you have the device itself you can use EXTRA_DOWNLOADS_* var
         if [ ! -d "$PROPRIETARY_BLOBS_DIR" ]; then
-            git clone -b cm-14.1 --single-branch $PROPRIETARY_BLOBS_REPO $PROPRIETARY_BLOBS_DIR
+            git clone -b "$PROPRIETARY_BLOBS_BRANCH" --single-branch "$PROPRIETARY_BLOBS_REPO" "$PROPRIETARY_BLOBS_DIR"
         else
             pushd $PROPRIETARY_BLOBS_DIR > /dev/null 2>&1
             git pull
@@ -156,7 +157,7 @@ function init {
 
     if [[ "$USE_CCACHE" == "1" ]]; then
         echo "[INFO] Enable caching at '$CCACHE_DIR' with $CCACHE_SIZE"
-        prebuilts/misc/linux-x86/ccache/ccache -M $CCACHE_SIZE
+        ccache -M $CCACHE_SIZE
     fi
 
     echo "[INFO] Setup 'build/envsetup.sh'"
@@ -213,7 +214,7 @@ function build {
     shopt -s expand_aliases
     source $BASE_DIR/build/envsetup.sh
     if [[ "$USE_CCACHE" == "1" ]]; then
-        prebuilts/misc/linux-x86/ccache/ccache -M $CCACHE_SIZE
+        ccache -M $CCACHE_SIZE
     fi
     # starts configuration
     breakfast $DEVICE_CODENAME

@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM eclipse-temurin:8-jammy
 LABEL maintainer="jfloff@inesc-id.pt"
 
 ###################
@@ -28,6 +28,8 @@ RUN set -ex ;\
           bc \
           bison \
           build-essential \
+          ccache \
+          curl \
           flex \
           g++-multilib \
           gcc-multilib \
@@ -38,12 +40,12 @@ RUN set -ex ;\
           lib32ncurses5-dev \
           lib32readline-dev \
           lib32z1-dev \
-          libesd0-dev \
+          libelf-dev \
           liblz4-tool \
+          libncurses5 \
           libncurses5-dev \
           libsdl1.2-dev \
           libssl-dev \
-          libwxgtk3.0-dev \
           libxml2 \
           libxml2-utils \
           lzop \
@@ -55,8 +57,10 @@ RUN set -ex ;\
           zip \
           zlib1g-dev \
           # extra packages
-          # for git-repo from google
-          python \
+          # for repo
+          python3 \
+          # for repo
+          openssh-client \
           # for ps command
           procps \
           # no less on debian *gasp!*
@@ -64,11 +68,13 @@ RUN set -ex ;\
           # so we have an editor inside the container
           vim \
           # has 'col' package needed for 'breakfast'
-	      bsdmainutils \
+          bsdmainutils \
+          # unzip is needed at least for Fairphone 4 build
+          unzip \
           # we can't build kernel on root (like docker runs)
           # we add these so we have a non-root user
           fakeroot \
-	      sudo \
+          sudo \
           ;\
     rm -rf /var/lib/apt/lists/*
 
@@ -84,6 +90,7 @@ RUN set -ex ;\
     # create paths: https://wiki.lineageos.org/devices/klte/build#create-the-directories
     curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo ;\
     chmod a+x /usr/bin/repo ;\
+    ln -s /usr/bin/python3 /usr/bin/python && \
     # config git coloring
     # check this link for things repo check:
     # https://gerrit.googlesource.com/git-repo/+/master/subcmds/init.py#328
@@ -99,6 +106,7 @@ COPY lineageos /bin
 COPY device-config $DEVICE_CONFIGS_DIR
 
 # set volume and user home folder
+RUN mkdir -p "$BASE_DIR" && chown "$USER:$USER" "$BASE_DIR"
 USER $USER
 WORKDIR $BASE_DIR
 

@@ -121,6 +121,7 @@ Here is a rundown of all the variables that you can set.
 | **`LINEAGEOS_LOCAL_MANIFEST_REPO`** | LineageOS local manifest repository. | *optional* | |
 | **`LINEAGEOS_LOCAL_MANIFEST_BRANCH`** | LineageOS local manifest branch. | *optional* | |
 | **`PROPRIETARY_BLOBS_REPO`** | Repo with the [device's proprietary blobs](https://wiki.lineageos.org/devices/klte/build#extract-proprietary-blobs). <br>*Example*: `https://github.com/TheMuppets/proprietary_vendor_samsung` |  *optional* | |
+| **`PROPRIETARY_BLOBS_BRANCH`** | Branch to use in the proprietary blobs repo |  *optional* | `$LINEAGEOS_BRANCH` |
 | **`PROPRIETARY_BLOBS_DIR`** | Directory to where the repo with the device's blobs will be cloned to. <br>*Example*: `$BASE_DIR/vendor/samsung` | *optional* | |
 | **`USE_CCACHE`** | Turn on caching to speed up build (see [more](https://wiki.lineageos.org/devices/klte/build#turn-on-caching-to-speed-up-build)) | *optional* | `1` |
 | **`CCACHE_SIZE`** | Maximum amount of cache disk space allowed | *optional* | `50G` |
